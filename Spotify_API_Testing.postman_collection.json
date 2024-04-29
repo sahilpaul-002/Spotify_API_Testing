@@ -1,0 +1,5550 @@
+{
+	"info": {
+		"_postman_id": "ddd9473e-5816-4911-9ba2-af091cd5df5d",
+		"name": "Spotify_API_Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34434442"
+	},
+	"item": [
+		{
+			"name": "Getting access token",
+			"item": [
+				{
+					"name": "Correct user credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"// Validating header content\r",
+									"pm.test(\"Content-Type header is present\", () => {\r",
+									"  pm.response.to.have.header(\"Content-Type\");\r",
+									"});\r",
+									"pm.test(\"Content-Type header is application/json\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"// Validate JSON reponse value\r",
+									"pm.test(\"Check token type\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.token_type).to.eql(\"Bearer\");\r",
+									"    pm.expect(jsonData.expires_in).to.eql(3600);\r",
+									"});\r",
+									"\r",
+									"// Validate Json schema\r",
+									"var schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"access_token\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"token_type\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"expires_in\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"access_token\",\r",
+									"    \"token_type\",\r",
+									"    \"expires_in\"\r",
+									"  ]\r",
+									"}\r",
+									"pm.test('Schema is valid', function() {\r",
+									"  pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									"// Store the access token as environment variable\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"accessToken\", jsonData.access_token);\r",
+									"pm.environment.set(\"tokenType\", jsonData.token_type);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "ec9d60739ba048cdbbfc0302b3504cdb",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "d8f55bab99dd43feadff90e43e18a154",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://accounts.spotify.com/api/token",
+							"protocol": "https",
+							"host": [
+								"accounts",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"api",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong grant_type user credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"// Validating header content\r",
+									"pm.test(\"Content-Type header is present\", () => {\r",
+									"  pm.response.to.have.header(\"Content-Type\");\r",
+									"});\r",
+									"pm.test(\"Content-Type header is application/json\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"// Validate JSON reponse value\r",
+									"pm.test(\"Check token type\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"unsupported_grant_type\");\r",
+									"    pm.expect(jsonData.error_description).to.eql(\"grant_type user_credentials is not supported\");\r",
+									"});\r",
+									"\r",
+									"// Validate Json schema\r",
+									"var schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"error\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"error_description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"error\",\r",
+									"    \"error_description\"\r",
+									"  ]\r",
+									"}\r",
+									"pm.test('Schema is valid', function() {\r",
+									"  pm.response.to.have.jsonSchema(schema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "user_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "ec9d60739ba048cdbbfc0302b3504cdb",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "d8f55bab99dd43feadff90e43e18a154",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://accounts.spotify.com/api/token",
+							"protocol": "https",
+							"host": [
+								"accounts",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"api",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong client_id user credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"// Validating header content\r",
+									"pm.test(\"Content-Type header is present\", () => {\r",
+									"  pm.response.to.have.header(\"Content-Type\");\r",
+									"});\r",
+									"pm.test(\"Content-Type header is application/json\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"// Validate JSON reponse value\r",
+									"pm.test(\"Check token type\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"invalid_client\");\r",
+									"    pm.expect(jsonData.error_description).to.eql(\"Invalid client\");\r",
+									"});\r",
+									"\r",
+									"// Validate Json schema\r",
+									"var schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"error\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"error_description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"error\",\r",
+									"    \"error_description\"\r",
+									"  ]\r",
+									"}\r",
+									"pm.test('Schema is valid', function() {\r",
+									"  pm.response.to.have.jsonSchema(schema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "abcd1234efgh4567",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "d8f55bab99dd43feadff90e43e18a154",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://accounts.spotify.com/api/token",
+							"protocol": "https",
+							"host": [
+								"accounts",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"api",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong client_secret user credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"// Validating header content\r",
+									"pm.test(\"Content-Type header is present\", () => {\r",
+									"  pm.response.to.have.header(\"Content-Type\");\r",
+									"});\r",
+									"pm.test(\"Content-Type header is application/json\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"// Validate JSON reponse value\r",
+									"pm.test(\"Check token type\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"invalid_client\");\r",
+									"    pm.expect(jsonData.error_description).to.eql(\"Invalid client secret\");\r",
+									"});\r",
+									"\r",
+									"// Validate Json schema\r",
+									"var schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"error\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"error_description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"error\",\r",
+									"    \"error_description\"\r",
+									"  ]\r",
+									"}\r",
+									"pm.test('Schema is valid', function() {\r",
+									"  pm.response.to.have.jsonSchema(schema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "ec9d60739ba048cdbbfc0302b3504cdb",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "abcd1234efgh4567",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://accounts.spotify.com/api/token",
+							"protocol": "https",
+							"host": [
+								"accounts",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"api",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong user credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 1000ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"// Validating header content\r",
+									"pm.test(\"Content-Type header is present\", () => {\r",
+									"  pm.response.to.have.header(\"Content-Type\");\r",
+									"});\r",
+									"pm.test(\"Content-Type header is application/json\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+									"});\r",
+									"// Validate JSON reponse value\r",
+									"pm.test(\"Check token type\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.error).to.eql(\"unsupported_grant_type\");\r",
+									"    pm.expect(jsonData.error_description).to.eql(\"grant_type user_credentials is not supported\");\r",
+									"});\r",
+									"\r",
+									"// Validate Json schema\r",
+									"var schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"error\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"error_description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"error\",\r",
+									"    \"error_description\"\r",
+									"  ]\r",
+									"}\r",
+									"pm.test('Schema is valid', function() {\r",
+									"  pm.response.to.have.jsonSchema(schema);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "user_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "abcd1234efgh4567",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "abcd1234efgh4567",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://accounts.spotify.com/api/token",
+							"protocol": "https",
+							"host": [
+								"accounts",
+								"spotify",
+								"com"
+							],
+							"path": [
+								"api",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artist",
+			"item": [
+				{
+					"name": "Getting artist",
+					"item": [
+						{
+							"name": "correct artist_id",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"artistId1\", \"0TnOYISbd1XYRBk9myaseg\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    // pm.expect(jsonData.id).to.eql(pm.variables.replaceIn(\"{{artistId}}\"));\r",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"    pm.expect(jsonData.type).to.eql(\"artist\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"external_urls\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"spotify\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"spotify\"\r",
+											"      ]\r",
+											"    },\r",
+											"    \"followers\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"href\": {\r",
+											"          \"type\": \"null\"\r",
+											"        },\r",
+											"        \"total\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"href\",\r",
+											"        \"total\"\r",
+											"      ]\r",
+											"    },\r",
+											"    \"genres\": {\r",
+											"      \"type\": \"array\",\r",
+											"      \"items\": [\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      ]\r",
+											"    },\r",
+											"    \"href\": {\r",
+											"      \"type\": \"string\"\r",
+											"    },\r",
+											"    \"id\": {\r",
+											"      \"type\": \"string\"\r",
+											"    },\r",
+											"    \"images\": {\r",
+											"      \"type\": \"array\",\r",
+											"      \"items\": [\r",
+											"        {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"height\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"url\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"width\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"height\",\r",
+											"            \"url\",\r",
+											"            \"width\"\r",
+											"          ]\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"height\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"url\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"width\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"height\",\r",
+											"            \"url\",\r",
+											"            \"width\"\r",
+											"          ]\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"height\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"url\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"width\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"height\",\r",
+											"            \"url\",\r",
+											"            \"width\"\r",
+											"          ]\r",
+											"        }\r",
+											"      ]\r",
+											"    },\r",
+											"    \"name\": {\r",
+											"      \"type\": \"string\"\r",
+											"    },\r",
+											"    \"popularity\": {\r",
+											"      \"type\": \"integer\"\r",
+											"    },\r",
+											"    \"type\": {\r",
+											"      \"type\": \"string\"\r",
+											"    },\r",
+											"    \"uri\": {\r",
+											"      \"type\": \"string\"\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"external_urls\",\r",
+											"    \"followers\",\r",
+											"    \"genres\",\r",
+											"    \"href\",\r",
+											"    \"id\",\r",
+											"    \"images\",\r",
+											"    \"name\",\r",
+											"    \"popularity\",\r",
+											"    \"type\",\r",
+											"    \"uri\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer  BQDBKJ5eo5jxbtpWjVOj7ryS84khybFpP_lTqzV7uV-T_m0cTfwvdn5BnBSKPxKgEb11"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong artist_id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"invalid id\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer  BQDBKJ5eo5jxbtpWjVOj7ryS84khybFpP_lTqzV7uV-T_m0cTfwvdn5BnBSKPxKgEb11"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/4Z8W4fKeB5YxbvdsavcxavxcvcxusRsdQVPb",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"4Z8W4fKeB5YxbvdsavcxavxcvcxusRsdQVPb"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invalid access token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer  BQDBKJ5eo5jxbtpWjVOj7ryS84khybFpP_lTqzV7uV-T_m0cTfwvdn5BnBSKPxKgEb11"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "expired access token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer  BQDBKJ5eo5jxbtpWjVOj7ryS84khybFpP_lTqzV7uV-T_m0cTfwvdn5BnBSKPxKgEb11"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Getting several artist",
+					"item": [
+						{
+							"name": "correct artist_ids",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"artistId2\", \"2CIMQHirSU0MQqyYHq0eOx\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.artists[0].id).to.eql(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"    pm.expect(jsonData.artists[0].type).to.eql(\"artist\");\r",
+											"    pm.expect(jsonData.artists[1].id).to.eql(pm.variables.replaceIn(\"{{artistId2}}\"));\r",
+											"    pm.expect(jsonData.artists[1].type).to.eql(\"artist\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"artists\": {\r",
+											"      \"type\": \"array\",\r",
+											"      \"items\": [\r",
+											"        {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"external_urls\": {\r",
+											"              \"type\": \"object\",\r",
+											"              \"properties\": {\r",
+											"                \"spotify\": {\r",
+											"                  \"type\": \"string\"\r",
+											"                }\r",
+											"              },\r",
+											"              \"required\": [\r",
+											"                \"spotify\"\r",
+											"              ]\r",
+											"            },\r",
+											"            \"followers\": {\r",
+											"              \"type\": \"object\",\r",
+											"              \"properties\": {\r",
+											"                \"href\": {\r",
+											"                  \"type\": \"null\"\r",
+											"                },\r",
+											"                \"total\": {\r",
+											"                  \"type\": \"integer\"\r",
+											"                }\r",
+											"              },\r",
+											"              \"required\": [\r",
+											"                \"href\",\r",
+											"                \"total\"\r",
+											"              ]\r",
+											"            },\r",
+											"            \"genres\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                }\r",
+											"              ]\r",
+											"            },\r",
+											"            \"href\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"id\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"images\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                }\r",
+											"              ]\r",
+											"            },\r",
+											"            \"name\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"popularity\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"type\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"uri\": {\r",
+											"              \"type\": \"string\"\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"external_urls\",\r",
+											"            \"followers\",\r",
+											"            \"genres\",\r",
+											"            \"href\",\r",
+											"            \"id\",\r",
+											"            \"images\",\r",
+											"            \"name\",\r",
+											"            \"popularity\",\r",
+											"            \"type\",\r",
+											"            \"uri\"\r",
+											"          ]\r",
+											"        },\r",
+											"        {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"external_urls\": {\r",
+											"              \"type\": \"object\",\r",
+											"              \"properties\": {\r",
+											"                \"spotify\": {\r",
+											"                  \"type\": \"string\"\r",
+											"                }\r",
+											"              },\r",
+											"              \"required\": [\r",
+											"                \"spotify\"\r",
+											"              ]\r",
+											"            },\r",
+											"            \"followers\": {\r",
+											"              \"type\": \"object\",\r",
+											"              \"properties\": {\r",
+											"                \"href\": {\r",
+											"                  \"type\": \"null\"\r",
+											"                },\r",
+											"                \"total\": {\r",
+											"                  \"type\": \"integer\"\r",
+											"                }\r",
+											"              },\r",
+											"              \"required\": [\r",
+											"                \"href\",\r",
+											"                \"total\"\r",
+											"              ]\r",
+											"            },\r",
+											"            \"genres\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"string\"\r",
+											"                }\r",
+											"              ]\r",
+											"            },\r",
+											"            \"href\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"id\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"images\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                },\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"height\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"url\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"width\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"height\",\r",
+											"                    \"url\",\r",
+											"                    \"width\"\r",
+											"                  ]\r",
+											"                }\r",
+											"              ]\r",
+											"            },\r",
+											"            \"name\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"popularity\": {\r",
+											"              \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"type\": {\r",
+											"              \"type\": \"string\"\r",
+											"            },\r",
+											"            \"uri\": {\r",
+											"              \"type\": \"string\"\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"external_urls\",\r",
+											"            \"followers\",\r",
+											"            \"genres\",\r",
+											"            \"href\",\r",
+											"            \"id\",\r",
+											"            \"images\",\r",
+											"            \"name\",\r",
+											"            \"popularity\",\r",
+											"            \"type\",\r",
+											"            \"uri\"\r",
+											"          ]\r",
+											"        }\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"artists\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists?ids={{artistId1}},{{artistId2}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "{{artistId1}},{{artistId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong artist_ids",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"artistId2\", \"2CIMQHirSU0MQqyYHq0eOx\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.artists[0]).to.eql(null);\r",
+											"    pm.expect(jsonData.artists[1]).to.eql(null);\r",
+											"    pm.expect(jsonData.artists).to.be.a(\"array\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists?ids=0TnOYISbd1XYtycuvgyuRyuivghiviBk9myaseg,2CIMQHirSU0MvgivhvgyuvyjkcgQqyYHq0eOx",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "0TnOYISbd1XYtycuvgyuRyuivghiviBk9myaseg,2CIMQHirSU0MvgivhvgyuvyjkcgQqyYHq0eOx"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invalid token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"artistId2\", \"2CIMQHirSU0MQqyYHq0eOx\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists?ids={{artistId1}},{{artistId2}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "{{artistId1}},{{artistId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "expired token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"artistId2\", \"2CIMQHirSU0MQqyYHq0eOx\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists?ids={{artistId1}},{{artistId2}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "{{artistId1}},{{artistId2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Getting artist's albums",
+					"item": [
+						{
+							"name": "correct id(required field))",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong id(required field))",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"invalid id\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/0TnOYISbd1XYRBfgsgfsfrwbfrbk9myaseg/albums",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"0TnOYISbd1XYRBfgsgfsfrwbfrbk9myaseg",
+										"albums"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"10\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details & limit=50(all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"50\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correctt details & limit<50 (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"49\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "limit_number>50 (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid limit, must be a number between 1 and 50\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups=single&market=ES&limit=51&offset=5",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "single"
+										},
+										{
+											"key": "market",
+											"value": "ES"
+										},
+										{
+											"key": "limit",
+											"value": "51"
+										},
+										{
+											"key": "offset",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details limit=1 (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"1\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details limit>1 (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"2\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "limit<1 (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid limit, must be a number between 1 and 50\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"0\");\r",
+											"pm.variables.set(\"offset\",\"5\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "limit_is_not_number (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid limit, must be a number between 1 and 50\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups=single&market=ES&limit=fvdeafr&offset=5",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "single"
+										},
+										{
+											"key": "market",
+											"value": "ES"
+										},
+										{
+											"key": "limit",
+											"value": "fvdeafr"
+										},
+										{
+											"key": "offset",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details offset=0(all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"10\");\r",
+											"pm.variables.set(\"offset\",\"0\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details offset>0(all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.items[0].album_group).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].album_type).to.eql(pm.variables.replaceIn(\"{{includeGroups}}\"));\r",
+											"    pm.expect(jsonData.items[0].type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.items[0].artists[0].type).to.eql(\"artist\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"10\");\r",
+											"pm.variables.set(\"offset\",\"1\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "offset<0(all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid offset, must be a number equal or greater than 0\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.variables.set(\"includeGroups\",\"single\");\r",
+											"pm.variables.set(\"market\",\"ES\");\r",
+											"pm.variables.set(\"limit\",\"10\");\r",
+											"pm.variables.set(\"offset\",\"-1\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups={{includeGroups}}&market={{market}}&limit={{limit}}&offset={{offset}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "{{includeGroups}}"
+										},
+										{
+											"key": "market",
+											"value": "{{market}}"
+										},
+										{
+											"key": "limit",
+											"value": "{{limit}}"
+										},
+										{
+											"key": "offset",
+											"value": "{{offset}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong include_groups (all field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Bad albumType: fsabeabve\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/albums?include_groups=fsabeabve&market=ES&limit=10&offset=5",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"albums"
+									],
+									"query": [
+										{
+											"key": "include_groups",
+											"value": "fsabeabve"
+										},
+										{
+											"key": "market",
+											"value": "ES"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "offset",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Getting artist's top tracks",
+					"item": [
+						{
+							"name": "correct details id (required field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.tracks[0].album.album_type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.tracks[0].type).to.eql(\"track\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/top-tracks",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"top-tracks"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong id (required field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"invalid id\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/0TnOYISbd1XYRBkfsvfsvb9myaseg/top-tracks",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"0TnOYISbd1XYRBkfsvfsvb9myaseg",
+										"top-tracks"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details (all fields)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.tracks[0].album.album_type).to.eql(\"album\");\r",
+											"    pm.expect(jsonData.tracks[0].type).to.eql(\"track\");\r",
+											"});\r",
+											"pm.test(\"Response body contains artist's Id\", function () {\r",
+											"    pm.expect(pm.response.text()).to.include(pm.variables.replaceIn(\"{{artistId1}}\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/top-tracks?market=ES",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"top-tracks"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ES"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong market (all fields)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid market code\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg/top-tracks?market=ESQWERTY",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"0TnOYISbd1XYRBk9myaseg",
+										"top-tracks"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ESQWERTY"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong details (all fields)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"invalid id\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/0TnOYISbd1XYRstesgshsgBk9myaseg/top-tracks?market=ESQWERTY",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"0TnOYISbd1XYRstesgshsgBk9myaseg",
+										"top-tracks"
+									],
+									"query": [
+										{
+											"key": "market",
+											"value": "ESQWERTY"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details id invalid token (required field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/top-tracks",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"top-tracks"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details id expired token(required field)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/top-tracks",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"top-tracks"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Getting artist's related artist",
+					"item": [
+						{
+							"name": "correct id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Response time is less than 1000ms', function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"})",
+											"",
+											"pm.test('Content-Type header is present', () => {",
+											"    pm.response.to.have.header('Content-Type');",
+											"})",
+											"",
+											"pm.test('Content-Type header is application/json', () => {",
+											"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"})",
+											"",
+											"pm.test('Response body contains artist\\'s Id', function () {",
+											"    pm.expect(pm.response.text()).to.include(\"artist\");",
+											"})",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/related-artists",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"related-artists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(400);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"invalid id\");\r",
+											"});\r",
+											"\r",
+											"// vaiate JSOn schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/0TnOYIvfdvbfdvfSbd1XYRBk9myaseg/related-artists",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"0TnOYIvfdvbfdvfSbd1XYRBk9myaseg",
+										"related-artists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct id  invalid token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(401);",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"error\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"status\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"message\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"status\",",
+											"        \"message\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"error\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/related-artists",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"related-artists"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct id  expired token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(401);",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"error\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"status\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"message\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"status\",",
+											"        \"message\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"error\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z"
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/artists/{{artistId1}}/related-artists",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"artists",
+										"{{artistId1}}",
+										"related-artists"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "headerPrefix",
+						"value": "{{tokenType}}",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Getting a user's profile",
+					"item": [
+						{
+							"name": "correct username",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Set user's name at collection level\r",
+											"pm.collectionVariables.set(\"user'sName\", \"sahil\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.replaceIn(\"{{user'sName}}\"));",
+											"    pm.expect(jsonData.type).to.eql(\"user\");",
+											"});",
+											"// Re-arrange string",
+											"var name = pm.variables.replaceIn(\"{{user'sName}}\")",
+											"char1 = name[0].toUpperCase()",
+											"new_name = name.replace(\"name[0]\", \"char1\");",
+											"pm.variables.set(\"nameId\", new_name);",
+											"pm.test(\"Check response id\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.id).to.eql(pm.variables.replaceIn(\"{{nameId}}\"));",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"display_name\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"external_urls\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"spotify\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"spotify\"",
+											"      ]",
+											"    },",
+											"    \"href\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"id\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"images\": {",
+											"      \"type\": \"array\",",
+											"      \"items\": [",
+											"        {",
+											"          \"type\": \"object\",",
+											"          \"properties\": {",
+											"            \"url\": {",
+											"              \"type\": \"string\"",
+											"            },",
+											"            \"height\": {",
+											"              \"type\": \"integer\"",
+											"            },",
+											"            \"width\": {",
+											"              \"type\": \"integer\"",
+											"            }",
+											"          },",
+											"          \"required\": [",
+											"            \"url\",",
+											"            \"height\",",
+											"            \"width\"",
+											"          ]",
+											"        },",
+											"        {",
+											"          \"type\": \"object\",",
+											"          \"properties\": {",
+											"            \"url\": {",
+											"              \"type\": \"string\"",
+											"            },",
+											"            \"height\": {",
+											"              \"type\": \"integer\"",
+											"            },",
+											"            \"width\": {",
+											"              \"type\": \"integer\"",
+											"            }",
+											"          },",
+											"          \"required\": [",
+											"            \"url\",",
+											"            \"height\",",
+											"            \"width\"",
+											"          ]",
+											"        }",
+											"      ]",
+											"    },",
+											"    \"type\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"uri\": {",
+											"      \"type\": \"string\"",
+											"    },",
+											"    \"followers\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"href\": {",
+											"          \"type\": \"null\"",
+											"        },",
+											"        \"total\": {",
+											"          \"type\": \"integer\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"href\",",
+											"        \"total\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"display_name\",",
+											"    \"external_urls\",",
+											"    \"href\",",
+											"    \"id\",",
+											"    \"images\",",
+											"    \"type\",",
+											"    \"uri\",",
+											"    \"followers\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/users/{{user'sName}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"{{user'sName}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invalid username",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Set user's name at collection level\r",
+											"pm.collectionVariables.set(\"user'sName\", \"sahil\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful POST request\", () => {",
+											"  pm.expect(pm.response.code).to.be.oneOf([400,500]);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(400);",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid username\");",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"error\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"status\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"message\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"status\",",
+											"        \"message\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"error\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/users/jdkovnpjefwvnfejwiovnefjiwvnvcadcvdavdsavdsvsvvdsv",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"jdkovnpjefwvnfejwiovnefjiwvnvcadcvdavdsavdsvsvvdsv"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invalid username 1",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Set user's name at collection level\r",
+											"pm.collectionVariables.set(\"user'sName\", \"sahil\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful POST request\", () => {",
+											"  pm.expect(pm.response.code).to.be.oneOf([400,500]);",
+											"});",
+											"pm.test('Response time is less than 1000ms', function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"})",
+											"",
+											"pm.test('Content-Type header is present', () => {",
+											"    pm.response.to.have.header('Content-Type');",
+											"})",
+											"",
+											"pm.test('Content-Type header is application/json', () => {",
+											"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"})",
+											"",
+											"pm.test('Check response body content', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(500);",
+											"    pm.expect(jsonData.error.message).to.eql('Server error.');",
+											"})",
+											"",
+											"var schema = {",
+											"    'type': 'object',",
+											"    'properties': {",
+											"        'error': {",
+											"            'type': 'object',",
+											"            'properties': {",
+											"                'status': { 'type': 'integer' },",
+											"                'message': { 'type': 'string' }",
+											"            },",
+											"            'required': [",
+											"                'status',",
+											"                'message'",
+											"            ]",
+											"        }",
+											"    },",
+											"    'required': ['error']",
+											"};",
+											"",
+											"pm.test('Schema is valid', function () {",
+											"    pm.response.to.have.jsonSchema(schema);",
+											"})",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/users/abcd123efgh4567",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"abcd123efgh4567"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "expired access token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Set user's name at collection level\r",
+											"pm.collectionVariables.set(\"user'sName\", \"sahil\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(401);",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"error\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"status\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"message\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"status\",",
+											"        \"message\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"error\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/users/{{user'sName}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"{{user'sName}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invalid access token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Set user's name at collection level\r",
+											"pm.collectionVariables.set(\"user'sName\", \"sahil\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"// Validating header content",
+											"pm.test(\"Content-Type header is present\", () => {",
+											"  pm.response.to.have.header(\"Content-Type\");",
+											"});",
+											"pm.test(\"Content-Type header is application/json\", () => {",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+											"});",
+											"// Validate JSON reponse value",
+											"pm.test(\"Check response body content\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error.status).to.eql(401);",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");",
+											"});",
+											"",
+											"// Validate JSON schema",
+											"var schema = {",
+											"  \"type\": \"object\",",
+											"  \"properties\": {",
+											"    \"error\": {",
+											"      \"type\": \"object\",",
+											"      \"properties\": {",
+											"        \"status\": {",
+											"          \"type\": \"integer\"",
+											"        },",
+											"        \"message\": {",
+											"          \"type\": \"string\"",
+											"        }",
+											"      },",
+											"      \"required\": [",
+											"        \"status\",",
+											"        \"message\"",
+											"      ]",
+											"    }",
+											"  },",
+											"  \"required\": [",
+											"    \"error\"",
+											"  ]",
+											"}",
+											"pm.test('Schema is valid', function() {",
+											"  pm.response.to.have.jsonSchema(schema);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 1POdFZRZbvb...qqillRxMr2z",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.spotify.com/v1/users/{{user'sName}}",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"users",
+										"{{user'sName}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Check if user follow playlist",
+					"item": [
+						{
+							"name": "correct details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"pm.test(\"The response has all properties\", () => {\r",
+											"    //parse the response JSON and test three properties\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.a('array');\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/followers/contains?ids=jmperezperez%2Cthelinmichael%2Cwizzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9oz9GiPac4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmperezperez%2Cthelinmichael%2Cwizzler"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details invalid token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"Invalid access token\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "headerPrefix",
+											"value": "{{tokenType}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "Spotify API",
+											"type": "string"
+										},
+										{
+											"key": "tokenType",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "refresh_token",
+											"value": "AQA-Dy9UghdRqVpVFNDbsG11VPIGaaxlH4Ut8hcE9n0KpqJAuz6WJhFs8B8xbcOSsjyEtqHeGeH3T8yzUD5Hr63LPIpU7M8ri4VRXD7x7lkgAJycCNvtYKV46kI3ERgLpk8",
+											"type": "string"
+										},
+										{
+											"key": "expires_in",
+											"value": 3600,
+											"type": "number"
+										},
+										{
+											"key": "token_id",
+											"type": "any"
+										},
+										{
+											"key": "timestamp",
+											"type": "any"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "https://accounts.spotify.com/authorize",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "278a6a0526f142009923f96e2d677256",
+											"type": "string"
+										},
+										{
+											"key": "accessTokenUrl",
+											"value": "https://accounts.spotify.com/api/token",
+											"type": "string"
+										},
+										{
+											"key": "useBrowser",
+											"value": true,
+											"type": "boolean"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/followers/contains?ids=jmperezperez%2Cthelinmichael%2Cwizzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9oz9GiPac4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmperezperez%2Cthelinmichael%2Cwizzler"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "correct details expired token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"// Validate JSON reponse value\r",
+											"pm.test(\"Check response body content\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.eql(401);\r",
+											"    pm.expect(jsonData.error.message).to.eql(\"The access token expired\");\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/followers/contains?ids=jmperezperez%2Cthelinmichael%2Cwizzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9oz9GiPac4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmperezperez%2Cthelinmichael%2Cwizzler"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong ids",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 502\", function () {\r",
+											"    pm.response.to.have.status(502);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"pm.test(\"The response has all properties\", () => {\r",
+											"    //parse the response JSON and test three properties\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.be.eql(502);\r",
+											"    pm.expect(jsonData.error.message).to.be.eql(\"Could not retrieve followers\");\r",
+											"});\r",
+											"\r",
+											"// Validate Json schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/followers/contains?ids=jmpewcxwxcwrezperez%2Cthelinmicwscwcwchael%2cxwxcwCwizzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9oz9GiPac4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmpewcxwxcwrezperez%2Cthelinmicwscwcwchael%2cxwxcwCwizzler"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong plyalist_id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"pm.test(\"The response has all properties\", () => {\r",
+											"    //parse the response JSON and test three properties\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.be.eql(404);\r",
+											"    pm.expect(jsonData.error.message).to.be.eql(\"Invalid playlist Id\");\r",
+											"});\r",
+											"\r",
+											"// Validate Json schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPahjlvj45643c4AsH4n/followers/contains?ids=jmperezperez%2Cthelinmichael%2Cwizzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9oz9GiPahjlvj45643c4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmperezperez%2Cthelinmichael%2Cwizzler"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"pm.test(\"Response time is less than 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"// Validating header content\r",
+											"pm.test(\"Content-Type header is present\", () => {\r",
+											"  pm.response.to.have.header(\"Content-Type\");\r",
+											"});\r",
+											"pm.test(\"Content-Type header is application/json\", () => {\r",
+											"  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+											"});\r",
+											"\r",
+											"// Validate JSON schema\r",
+											"pm.test(\"The response has all properties\", () => {\r",
+											"    //parse the response JSON and test three properties\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.error.status).to.be.eql(404);\r",
+											"    pm.expect(jsonData.error.message).to.be.eql(\"Invalid playlist Id\");\r",
+											"});\r",
+											"\r",
+											"// Validate Json schema\r",
+											"var schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"error\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"status\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"message\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"status\",\r",
+											"        \"message\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"error\"\r",
+											"  ]\r",
+											"}\r",
+											"pm.test('Schema is valid', function() {\r",
+											"  pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.spotify.com/v1/playlists/3cEYpjA9otycgjcgz9GiPac4AsH4n/followers/contains?ids=jmperefgjgftczperez%2Cthelighkcghnmichael%2Cwigycvghjkzzler",
+									"protocol": "https",
+									"host": [
+										"api",
+										"spotify",
+										"com"
+									],
+									"path": [
+										"v1",
+										"playlists",
+										"3cEYpjA9otycgjcgz9GiPac4AsH4n",
+										"followers",
+										"contains"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "jmperefgjgftczperez%2Cthelighkcghnmichael%2Cwigycvghjkzzler"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "oauth2",
+						"oauth2": [
+							{
+								"key": "headerPrefix",
+								"value": "{{tokenType}}",
+								"type": "string"
+							},
+							{
+								"key": "addTokenTo",
+								"value": "header",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "headerPrefix",
+						"value": "{{tokenType}}",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "user'sName",
+			"value": ""
+		},
+		{
+			"key": "artistId1",
+			"value": ""
+		},
+		{
+			"key": "artistId2",
+			"value": ""
+		}
+	]
+}
